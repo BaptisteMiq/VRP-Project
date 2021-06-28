@@ -1,13 +1,17 @@
 # Importer les bon trucs
+import tracemalloc
+import matplotlib.pyplot as plt
+import algogenOGM.geneticPathFinderOGM
+from graphGeneration import randomDataGenerator
 
-def genMemoryStat(minSize, maxSize):
+def genMemoryStat(minSize, maxSize, populationSize):
     peakMemoryList = list()
     graphSizeList = list()
     for i in range(minSize-1, maxSize):
         # print(i)
         tracemalloc.start()
         dataGraph = randomDataGenerator(1, i, False)
-        geneticPathFinder(mutationRate, populationSize, 3, 5000, 1, dataGraph, 0, False)
+        geneticPathFinderOGM(mutationRate, populationSize, 3, 5000, 1, dataGraph, 0, False)
         # Memory allocation display
         current, peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
