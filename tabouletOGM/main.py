@@ -18,8 +18,4 @@ nbCamion = 6
 #pop = Population(mutationRate,populationSize, nbCamion, graph, position, True)
 # pop.tabuADNGenerator()
 
-<<<<<<< HEAD
 algogenOGM.geneticPathFinderOGM(mutationRate, len(graph), nbCamion, maxGen, graph, 0, True)
-=======
-geneticPathFinderOGM(mutationRate, len(graph), nbCamion, maxGen, randomDataGenerator(1,10,False), 0, True)
->>>>>>> c2ddb648877954c0b14fe44045f3f5d9a0adbe94
