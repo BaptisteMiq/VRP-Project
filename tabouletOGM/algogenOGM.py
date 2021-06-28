@@ -1,4 +1,4 @@
-from Population import Population
+from . import Population
 
 # Alfo génétique pour solution problème voyageur de commerce complet :
 def iterateGeneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGeneneration, nbIteration, graph, startPosition, isDebug):
@@ -12,7 +12,7 @@ def iterateGeneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGenene
 
     for nbIte in range(nbIteration):
         if isDebug: print("------ Entering new iteration:", nbIte)
-        pop = Population(mutationChance, graphSize, nbVehicule, graph, startPosition, isDebug)
+        pop = Population.Population(mutationChance, graphSize, nbVehicule, graph, startPosition, isDebug)
         pop.start(maxGeneneration)
         if pop.bestFitness > bestFitness:
             bestPath = pop.bestPath
@@ -38,7 +38,7 @@ def iterateGeneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGenene
 def geneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGeneneration, graph, startPosition, isDebug):
     if isDebug: print("--- STARTING GENETIC ALGORITHME GRAPH PATH FINDING ---")
     
-    pop = Population(mutationChance, graphSize, nbVehicule, graph, startPosition, isDebug)
+    pop = Population.Population(mutationChance, graphSize, nbVehicule, graph, startPosition, isDebug)
     pop.start(maxGeneneration)
     
     bestPath = pop.bestPath
@@ -59,3 +59,4 @@ def geneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGeneneration,
         for i in range(len(bestFitnessList)):
             print("Vehicule N°", i, "-", bestVehiculePath[i], "-", bestFitnessList[i])
         
+    return bestFitness

@@ -1,10 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from graphGeneration import randomDataGenerator
-
-from tabu import tabu
-
 def buildGraph(values, pond, totSize):
     #print(values, pond, totSize)
     size = totSize
@@ -108,6 +104,6 @@ def drawGraphs(graph, graphs, labels=None, graph_layout='shell',
 def generateGraph(graph, paths, pond = []):
     drawGraphs(graph, [buildGraph(paths[i], pond, len(graph)) for i in range(len(paths))])
 
-graph = randomDataGenerator(1, 32, False)
-(bestPath, bestDistance, totalLength) = tabu(graph, 6, 10)
-generateGraph(graph, bestPath)
+# graph = randomDataGenerator(1, 32, False)
+# (bestPath, bestDistance, totalLength) = tabu(graph, 6, 10)
+# generateGraph(graph, bestPath)

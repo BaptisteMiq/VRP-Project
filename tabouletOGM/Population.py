@@ -1,7 +1,7 @@
 # Population object
 import copy, random
-from ADNtrajet import ADNtrajet
-from tabu import tabu
+from . import ADNtrajet
+from . import tabu
 
 class Population:
     
@@ -47,13 +47,13 @@ class Population:
             defaultPath.append(self.startPosition)
         
         #First population value come from tabu algo
-        self.populations.append(ADNtrajet(self.tabuADNGenerator(), graph))
+        self.populations.append(ADNtrajet.ADNtrajet(self.tabuADNGenerator(), graph))
         for i in range(size-1):
             randomPath = defaultPath.copy()
             random.shuffle(randomPath)
             randomPath.insert(0,self.startPosition)
             randomPath.append(self.startPosition)
-            self.populations.append(ADNtrajet(randomPath, graph))
+            self.populations.append(ADNtrajet.ADNtrajet(randomPath, graph))
             
         self.populations.sort(key=lambda x: x.fitness)
         self.bestPath = self.populations[0].ADN.copy()
@@ -64,7 +64,7 @@ class Population:
 
 
     def tabuADNGenerator(self):
-        tabuPath = tabu(self.graph, self.nbVehicule, 20, self.startPosition)
+        tabuPath = tabu.tabu(self.graph, self.nbVehicule, 20, self.startPosition)
         print(tabuPath)
         return tabuPath
 

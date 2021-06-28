@@ -1,5 +1,5 @@
 import threading
-from genetic import geneticPathFinder
+from algorithms.genetic import geneticPathFinder
 from numba import jit, cuda
 
 class GeneticThread(threading.Thread):

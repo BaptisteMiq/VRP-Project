@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import pprint
 
 def randomDataGenerator(proba, nbSommet, doPrint):
     b = np.random.choice((1, 0), size=(nbSommet,nbSommet), p=[proba, 1-proba])
