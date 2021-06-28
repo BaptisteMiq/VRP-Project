@@ -28,6 +28,10 @@ def tabu(graph, nbVehicules, nbIter, startPoint):
 
             # Loop for every vehicule
             for v in range(nbVehicules):
+
+                if(len(visited) >= len(graph)):
+                    break
+
                 # Worst case
                 bestDistance = 9999
                 bestNeighbour = startPoint
@@ -55,12 +59,12 @@ def tabu(graph, nbVehicules, nbIter, startPoint):
                             if(neighbour <= bestDistance):
                                 bestDistance = neighbour
                                 bestNeighbour = j
-                else:
-                    bestPaths[v].append(bestNeighbour)
-                    visited.append(bestNeighbour)
-                    currentElements[v] = bestNeighbour
-                    totLens[v] += bestDistance
-                    bestDistances[v].append(bestDistance)
+
+                bestPaths[v].append(bestNeighbour)
+                visited.append(bestNeighbour)
+                currentElements[v] = bestNeighbour
+                totLens[v] += bestDistance
+                bestDistances[v].append(bestDistance)
 
         for v in range(nbVehicules):
             # Return to start point

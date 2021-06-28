@@ -10,7 +10,7 @@ def tabu(graph, nbVehicules, nbIter):
     maxTabuListSize = 50
     
     bestPathIteration = {}
-        
+    
     for it in range(nbIter):
         
         currentElements = [startPoint] * nbVehicules
@@ -22,12 +22,17 @@ def tabu(graph, nbVehicules, nbIter):
         totPoints = len(graph)
         
         prematurateEnd = False
-        
+
         while len(visited) < len(graph) and not prematurateEnd:
-            #print(len(visited), len(graph))
+            # print("-------")
+            # print("0", len(visited))
 
             # Loop for every vehicule
             for v in range(nbVehicules):
+
+                if(len(visited) >= len(graph)):
+                    break
+
                 # Worst case
                 bestDistance = 9999
                 bestNeighbour = startPoint
@@ -46,7 +51,7 @@ def tabu(graph, nbVehicules, nbIter):
 
                 # Could not find a solution => All combinaisons in tabou have been tried
                 if(bestNeighbour == startPoint):
-                    #print("NO SOLUTION", (currentElements[v], j))
+                    # print("NO SOLUTION", (currentElements[v], j, visited, tabuList))
                     # Search nearest neighbour
                     for j in range(totPoints):
                         # Check if the path is not used (including other vehicules) + Check if path exists in tabu
@@ -55,12 +60,14 @@ def tabu(graph, nbVehicules, nbIter):
                             if(neighbour <= bestDistance):
                                 bestDistance = neighbour
                                 bestNeighbour = j
-                else:
-                    bestPaths[v].append(bestNeighbour)
-                    visited.append(bestNeighbour)
-                    currentElements[v] = bestNeighbour
-                    totLens[v] += bestDistance
-                    bestDistances[v].append(bestDistance)
+                
+                bestPaths[v].append(bestNeighbour)
+                visited.append(bestNeighbour)
+                currentElements[v] = bestNeighbour
+                totLens[v] += bestDistance
+                bestDistances[v].append(bestDistance)
+
+                # print("1", len(visited))
 
         for v in range(nbVehicules):
             # Return to start point

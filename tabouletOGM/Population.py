@@ -65,7 +65,7 @@ class Population:
 
     def tabuADNGenerator(self):
         tabuPath = tabu.tabu(self.graph, self.nbVehicule, 20, self.startPosition)
-        print(tabuPath)
+        #print(tabuPath)
         return tabuPath
 
     def getPopADNs(self):
@@ -94,7 +94,7 @@ class Population:
             if progress >= progressState:
                 if self.debug: print(progressState, "%")
                 progressState += 10
-            for i in range(round(self.populationSize/2)):
+            for i in range(round(self.populationSize/2) - 1):
                 self.populations[i+round(self.populationSize/2)] = copy.deepcopy(self.populations[i])
             for i in range(round(self.populationSize/2), self.populationSize):
                 self.populations[i].forceMutate(self.nbMutation, self.graph)
