@@ -1,5 +1,5 @@
 import random
-from numba import jit, cuda
+# from numba import jit, cuda
 
 # Population element DNA object :
 # - Peut être à changer en trajet / ADNTrajet
@@ -145,9 +145,14 @@ class Population:
             print(o.ADN, o.fitness)
 
     def start(self, maxGen):
+        checkSmallSize = (self.nbSommet**2 - self.nbSommet) / 2
+        if checkSmallSize <= self.populationSize:
+            self.populationSize = round(checkSmallSize) - 1
+            self.populations = self.populations[0:self.populationSize]
+            maxGen = self.populationSize + 10
         for nbGen in range(maxGen):
             #print("Starting generation", nbGen)
-            for i in range(round(self.populationSize/2)):
+            for i in range(round(self.populationSize/2)-1):
                 self.populations[i+round(self.populationSize/2)] = copy.deepcopy(self.populations[i])
             for i in range(round(self.populationSize/2), self.populationSize):
                 # print("population index:",i)
