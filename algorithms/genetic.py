@@ -83,12 +83,18 @@ class Population:
     bestGlobalFitness = 0
     
     def __init__(self, mutation, size, vehicule, graph, startPos):
+
         self.nbMutation = mutation
         self.populationSize = size
         self.populations = []*(size + vehicule - 1)
         
         self.graph = graph
         self.nbSommet = len(graph)
+
+        if self.nbSommet == 0 or self.nbSommet == 1:
+            print("Error: graph node number is null or unique")
+            return
+
         self.nbVehicule = vehicule
         if 0 <= startPos <= self.nbSommet - 1:
             self.startPosition = startPos
@@ -145,11 +151,24 @@ class Population:
             print(o.ADN, o.fitness)
 
     def start(self, maxGen):
+
+        if self.nbSommet == 2:
+            self.bestPath = [0,1,0]
+            self.bestFitness = (self.graph[0][2] * 2)
+            #self.bestFitnessList = self.populations[0].fitnessList
+            #self.bestVehiculePath = self.populations[0].vehiculeADNlist
+            #self.bestGlobalFitness = self.populations[0].globalFitness
+            return
+
+        #print(self.nbSommet)
         checkSmallSize = (self.nbSommet**2 - self.nbSommet) / 2
+        #print(checkSmallSize)
         if checkSmallSize <= self.populationSize:
             self.populationSize = round(checkSmallSize) - 1
             self.populations = self.populations[0:self.populationSize]
             maxGen = self.populationSize + 10
+            #print(self.populations)
+        
         for nbGen in range(maxGen):
             #print("Starting generation", nbGen)
             for i in range(round(self.populationSize/2)-1):
@@ -165,6 +184,7 @@ class Population:
             self.populations.sort(key=lambda x: x.fitness)
             
             #print(len(self.populations))
+            #print(self.populations)
             
             #for i, o in enumerate(self.population):
             #    print("element:", i, "- fitness:", o.fitness)

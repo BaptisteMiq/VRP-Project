@@ -77,15 +77,17 @@ class Population:
     
     def __init__(self, mutation, size, vehicule, graph, startPos, isDebug):
 
-        
-
-
         self.nbMutation = mutation
         self.populationSize = size
         self.populations = []*(size + vehicule - 1)
         
         self.graph = graph
         self.nbSommet = len(graph)
+
+        if self.nbSommet == 0 or self.nbSommet == 1:
+            print("Error: graph node number is null or ")
+            return
+
         self.nbVehicule = vehicule
         if 0 <= startPos <= self.nbSommet - 1:
             self.startPosition = startPos
@@ -104,13 +106,13 @@ class Population:
             defaultPath.append(self.startPosition)
         
         #First population value come from tabu algo
-        self.populations.append(ADNtrajet.ADNtrajet(self.tabuADNGenerator(), graph))
+        self.populations.append(ADNtrajet(self.tabuADNGenerator(), graph))
         for i in range(size-1):
             randomPath = defaultPath.copy()
             random.shuffle(randomPath)
             randomPath.insert(0,self.startPosition)
             randomPath.append(self.startPosition)
-            self.populations.append(ADNtrajet.ADNtrajet(randomPath, graph))
+            self.populations.append(ADNtrajet(randomPath, graph))
             
         self.populations.sort(key=lambda x: x.fitness)
         self.bestPath = self.populations[0].ADN.copy()
@@ -121,7 +123,7 @@ class Population:
 
 
     def tabuADNGenerator(self):
-        tabuPath = tabu.tabu(self.graph, self.nbVehicule, 20, self.startPosition)
+        tabuPath = tabu(self.graph, self.nbVehicule, 20, self.startPosition)
         #print(tabuPath)
         return tabuPath
 
@@ -144,6 +146,14 @@ class Population:
             print(o.ADN, o.fitness)
 
     def start(self, maxGen):
+
+        if self.nbSommet == 2:
+            self.bestPath = [0,1,0]
+            self.bestFitness = (self.graph[0][2] * 2)
+            #self.bestFitnessList = self.populations[0].fitnessList
+            #self.bestVehiculePath = self.populations[0].vehiculeADNlist
+            #self.bestGlobalFitness = self.populations[0].globalFitness
+            return
 
         checkSmallSize = (self.nbSommet**2 - self.nbSommet) / 2
         if checkSmallSize <= self.populationSize:
@@ -185,7 +195,7 @@ def iterateGeneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGenene
 
     for nbIte in range(nbIteration):
         if isDebug: print("------ Entering new iteration:", nbIte)
-        pop = Population.Population(mutationChance, graphSize, nbVehicule, graph, startPosition, isDebug)
+        pop = Population(mutationChance, graphSize, nbVehicule, graph, startPosition, isDebug)
         pop.start(maxGeneneration)
         if pop.bestFitness > bestFitness:
             bestPath = pop.bestPath
@@ -211,7 +221,7 @@ def iterateGeneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGenene
 def geneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGeneneration, graph, startPosition, isDebug):
     if isDebug: print("--- STARTING GENETIC ALGORITHME GRAPH PATH FINDING ---")
     
-    pop = Population.Population(mutationChance, graphSize, nbVehicule, graph, startPosition, isDebug)
+    pop = Population(mutationChance, graphSize, nbVehicule, graph, startPosition, isDebug)
     pop.start(maxGeneneration)
     
     bestPath = pop.bestPath
