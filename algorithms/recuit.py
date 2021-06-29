@@ -42,18 +42,6 @@ def generatePointList(cities):
         point.append([np.random.randint(0, (i+1)*(i+1)), np.random.randint(0, (i+1)*(i+1))])
     return point
 
-def live_plot(tour, cities):
-    cities_x = []
-    cities_y = []
-    for i in range(len(tour)):
-        cities_x.append(pointList[tour[i]][0])
-        cities_y.append(pointList[tour[i]][1])
-    cities_x.append(pointList[tour[0]][0])
-    cities_y.append(pointList[tour[0]][1])
-    plt.clf()
-    plt.plot(cities_x, cities_y, 'xb-')
-    plt.pause(0.1)
-    
 def arrayloop(arr, start, end):
     arr_len = len(arr)
     ret = []

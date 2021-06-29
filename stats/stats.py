@@ -6,13 +6,10 @@ import matplotlib.pyplot as plt
 
 import math
 
-from graphGeneration import randomDataGenerator
-from graphChecker import calcPathEfficiency
+from tools.graphGeneration import randomDataGenerator
+from tools.graphChecker import calcPathEfficiency
 
 from algorithms.tabu import tabu
-from . import threads
-
-from functools import partial
 
 import multiprocessing as mp
 
@@ -43,27 +40,30 @@ timeGoogleShared = []
 
 # Metaheuristic used by Google algorithms
 gmeta = "AUTOMATIC"
+gdoPrint = True
 
 # Wrap all algorithm functions to be started with only one argument
 def startGeneticWrapper(it):
-    print("genThreads", genThreads)
-    StartAlgorithm.Genetic(it, worstsGenShared, ramGenShared, timeGenShared, genThreads[it])
+    StartAlgorithm.Genetic(it, worstsGenShared, ramGenShared, timeGenShared, genThreads[it], gdoPrint)
 def startTabouOGMWrapper(it):
-    StartAlgorithm.TabouOGM(it, worstsTabouOGMShared, ramTabouOGMShared, timeTabouOGMShared, tabouOGMThreads[it])
+    StartAlgorithm.TabouOGM(it, worstsTabouOGMShared, ramTabouOGMShared, timeTabouOGMShared, tabouOGMThreads[it], gdoPrint)
 def startFourmiWrapper(it):
-    StartAlgorithm.Fourmi(it, worstsFourmiShared, ramFourmiShared, timeFourmiShared, fourmiThreads[it])
+    StartAlgorithm.Fourmi(it, worstsFourmiShared, ramFourmiShared, timeFourmiShared, fourmiThreads[it], gdoPrint)
 def startRecuitWrapper(it):
-    StartAlgorithm.Recuit(it, worstsRecuitShared, ramRecuitShared, timeRecuitShared, recuitThreads[it])
+    StartAlgorithm.Recuit(it, worstsRecuitShared, ramRecuitShared, timeRecuitShared, recuitThreads[it], gdoPrint)
 def startGoogleWrapper(it):
-    StartAlgorithm.Google(it, worstsGoogleShared, ramGoogleShared, timeGoogleShared, googleThreads[it], gmeta)
+    StartAlgorithm.Google(it, worstsGoogleShared, ramGoogleShared, timeGoogleShared, googleThreads[it], gmeta, gdoPrint)
 
-def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC"):
+def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC", doPrint = True, maxGraph = None):
 
     global gmeta
+    global gdoPrint
     gmeta = _gmeta
+    gdoPrint = doPrint
 
     # Maximum graph size
-    maxGraph = randomDataGenerator(1, maxIterations, False, 10)
+    if not maxGraph:
+        maxGraph = randomDataGenerator(1, maxIterations, False)
 
     # Setup iterations
     minSize = minIterations
@@ -111,7 +111,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
             g.append(maxGraph[j][0:i])
         initGraph = g
 
-        print("Calculating tabu", it)
+        if(doPrint): print("Calculating tabu", it)
 
         # Tabu
         tracemalloc.start()
@@ -130,11 +130,11 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
 
         ramTabu.append(peak / 10**6)
 
-        print("Found a result for tabu", it, ":", worst)
+        if(doPrint): print("Found a result for tabu", it, ":", worst)
 
         genThreads[it] = {
             "g": g,
-            "nbVehicules": 3
+            "nbVehicules": 1
         }
 
         tabouOGMThreads[it] = {
@@ -144,12 +144,12 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
 
         fourmiThreads[it] = {
             "g": g,
-            "nbVehicules": 3
+            "nbVehicules": 1
         }
 
         recuitThreads[it] = {
             "g": g,
-            "nbVehicules": 3
+            "nbVehicules": 1
         }
 
         googleThreads[it] = {
@@ -202,7 +202,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
         # Define a maximum number of cores to use at the same time
         # Will crash if the maximum is over the number of available cores
         for i in range(math.ceil(len(genThreads) / maxCores)):
-            print("Starting process subdivision", i)
+            if(doPrint): print("Starting process subdivision", i)
             # Start the algorithm on every specified core
             
             try:
@@ -211,7 +211,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
                 pass
 
             p = mp.Pool(maxCores * 32)
-            print(i*maxCores, min(i*maxCores+maxCores, len(genThreads)))
+            if(doPrint): print(i*maxCores, min(i*maxCores+maxCores, len(genThreads)))
             p.map(startGeneticWrapper, range(i*maxCores, min(i*maxCores+maxCores, len(genThreads))))
             p.close()
         return (worstsGenShared, ramGenShared, timeGenShared)
@@ -224,7 +224,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
         # Define a maximum number of cores to use at the same time
         # Will crash if the maximum is over the number of available cores
         for i in range(math.ceil(len(tabouOGMThreads) / maxCores)):
-            print("Starting process subdivision", i)
+            if(doPrint): print("Starting process subdivision", i)
             # Start the algorithm on every specified core
             
             try:
@@ -233,7 +233,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
                 pass
 
             p = mp.Pool(maxCores * 32)
-            print(i*maxCores, min(i*maxCores+maxCores, len(tabouOGMThreads)))
+            if(doPrint): print(i*maxCores, min(i*maxCores+maxCores, len(tabouOGMThreads)))
             p.map(startTabouOGMWrapper, range(i*maxCores, min(i*maxCores+maxCores, len(tabouOGMThreads))))
             p.close()
         return (worstsTabouOGMShared, ramTabouOGMShared, timeTabouOGMShared)
@@ -246,7 +246,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
         # Define a maximum number of cores to use at the same time
         # Will crash if the maximum is over the number of available cores
         for i in range(math.ceil(len(fourmiThreads) / maxCores)):
-            print("Starting process subdivision", i)
+            if(doPrint): print("Starting process subdivision", i)
             # Start the algorithm on every specified core
             
             try:
@@ -255,7 +255,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
                 pass
 
             p = mp.Pool(maxCores * 32)
-            print(i*maxCores, min(i*maxCores+maxCores, len(fourmiThreads)))
+            if(doPrint): print(i*maxCores, min(i*maxCores+maxCores, len(fourmiThreads)))
             p.map(startFourmiWrapper, range(i*maxCores, min(i*maxCores+maxCores, len(fourmiThreads))))
             p.close()
         return (worstsFourmiShared, ramFourmiShared, timeFourmiShared)
@@ -268,7 +268,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
         # Define a maximum number of cores to use at the same time
         # Will crash if the maximum is over the number of available cores
         for i in range(math.ceil(len(recuitThreads) / maxCores)):
-            print("Starting process subdivision", i)
+            if(doPrint): print("Starting process subdivision", i)
             # Start the algorithm on every specified core
             
             try:
@@ -277,7 +277,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
                 pass
 
             p = mp.Pool(maxCores * 32)
-            print(i*maxCores, min(i*maxCores+maxCores, len(recuitThreads)))
+            if(doPrint): print(i*maxCores, min(i*maxCores+maxCores, len(recuitThreads)))
             p.map(startRecuitWrapper, range(i*maxCores, min(i*maxCores+maxCores, len(recuitThreads))))
             p.close()
         return (worstsRecuitShared, ramRecuitShared, timeRecuitShared)
@@ -290,7 +290,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
         # Define a maximum number of cores to use at the same time
         # Will crash if the maximum is over the number of available cores
         for i in range(math.ceil(len(googleThreads) / maxCores)):
-            print("Starting process subdivision", i)
+            if(doPrint): print("Starting process subdivision", i)
             # Start the algorithm on every specified core
             
             try:
@@ -299,7 +299,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC")
                 pass
 
             p = mp.Pool(maxCores * 32)
-            print(i*maxCores, min(i*maxCores+maxCores, len(googleThreads)))
+            if(doPrint): print(i*maxCores, min(i*maxCores+maxCores, len(googleThreads)))
             p.map(startGoogleWrapper, range(i*maxCores, min(i*maxCores+maxCores, len(googleThreads))))
             p.close()
         return (worstsGoogleShared, ramGoogleShared, timeGoogleShared)
@@ -330,12 +330,6 @@ def showStats(x, dataset, maxGraphSize, type):
     datasetWithRegression = []
 
     for k, data in enumerate(dataset):
-
-        print("-----------------------")
-        print(data["worst"])
-        print(data["ram"])
-        print(data["time"])
-        
 
         # Calculate regression
         coef = np.polyfit(x, data[type], 1)

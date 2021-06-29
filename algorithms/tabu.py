@@ -1,7 +1,7 @@
-from graphGeneration import randomDataGenerator
-from graphChecker import calcPathEfficiency
+from tools.graphGeneration import randomDataGenerator
+from tools.graphChecker import calcPathEfficiency
 
-def tabu(graph, nbVehicules, nbIter):
+def tabu(graph, nbVehicules, nbIter, startPoint = 0, concat = False):
     initGraph = graph
     startPoint = 0
     
@@ -67,8 +67,6 @@ def tabu(graph, nbVehicules, nbIter):
                 totLens[v] += bestDistance
                 bestDistances[v].append(bestDistance)
 
-                # print("1", len(visited))
-
         for v in range(nbVehicules):
             # Return to start point
             bestPaths[v].append(startPoint)
@@ -85,8 +83,16 @@ def tabu(graph, nbVehicules, nbIter):
                 "totLens": totLens,
                 "worst": worst
             }
+    
+    if(concat):
+        resultPath = list()
+        for i, o in enumerate(bestPathIteration["bestPaths"]):
+            for y in range(len(o)-1):
+                resultPath.append(o[y])
+        resultPath.append(startPoint)
+        
+        return resultPath
 
-    #print(tabuList)
     return (bestPathIteration["bestPaths"], bestPathIteration["bestDistances"], bestPathIteration["totLens"])
 
 # graph = randomDataGenerator(1, 200, False)

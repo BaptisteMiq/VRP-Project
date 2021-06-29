@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import pprint
+import csv
 
 def randomDataGenerator(proba, nbSommet, doPrint, max = 1):
     b = np.random.choice((1, 0), size=(nbSommet,nbSommet), p=[proba, 1-proba])
@@ -28,5 +29,19 @@ def randomDataGenerator(proba, nbSommet, doPrint, max = 1):
     #initGraph = newTab
     return newTab
 
-# graph = randomDataGenerator(1, 20, False)
-# print(graph)
+# Sauvegarde la matrice du graphe dans un fichier .csv
+def graphAsCsv(name, matrix):
+    with open(name, mode='w', newline="") as graphData_file:
+        graphData_writer = csv.writer(graphData_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    
+        for row in matrix:
+            graphData_writer.writerow(row)
+            print(row)
+
+def csvToGraph(file):
+    return np.loadtxt(open(file, "r"), delimiter=",").tolist()
+
+def generateCsv():
+    sizes = [20, 40, 80, 140, 500]
+    for i in range(len(sizes)):
+        graphAsCsv("ran-" + str(sizes[i]) + "x" + str(sizes[i]) + ".csv", randomDataGenerator(1, sizes[i], False))

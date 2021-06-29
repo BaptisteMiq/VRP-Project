@@ -1,4 +1,4 @@
-from tabouletOGM.algogenOGM import geneticPathFinderOGM
+from algorithms.tabugenetic import geneticPathFinderOGM
 from algorithms.genetic import geneticPathFinder
 from algorithms.fourmi import antColonyAlg
 from algorithms.recuit import getBestRS
@@ -7,8 +7,8 @@ import tracemalloc
 import time
 
 class StartAlgorithm:
-    def Genetic(ind, worstsGenShared, ramGenShared, timeGenShared, data):
-        print("Calculating genetic", ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
+    def Genetic(ind, worstsGenShared, ramGenShared, timeGenShared, data, doPrint):
+        if(doPrint): print("Calculating genetic", ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
 
         tracemalloc.start()
 
@@ -22,7 +22,6 @@ class StartAlgorithm:
         maxIteration = 1
         # Parametre 
         position = 0
-        nbCamion = 3
         # Start algorithm
         worst = geneticPathFinder(mutationRate, populationSize, data["nbVehicules"], maxGen, maxIteration, data["g"], position)
         worstsGenShared[ind] = worst
@@ -34,21 +33,17 @@ class StartAlgorithm:
 
         timeGenShared[ind] = time.time() - startTime
 
-        print("Found a result for genetic", ind, ":", worst)
+        if(doPrint): print("Found a result for genetic", ind, ":", worst)
 
-    def TabouOGM(ind, worstsTabouOGMShared, ramTabouOGMShared, timeTabouOGMShared, data):
-        print("Calculating taboulet OGM", ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
+    def TabouOGM(ind, worstsTabouOGMShared, ramTabouOGMShared, timeTabouOGMShared, data, doPrint):
+        if(doPrint): print("Calculating taboulet OGM", ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
 
         tracemalloc.start()
 
         startTime = time.time()
 
         mutationRate = 1
-        populationSize = 40
         maxGen = 5000
-        maxIteration = 1
-        position = 0
-        nbCamion = 6
 
         #pop = Population(mutationRate,populationSize, nbCamion, graph, position, True)
         # pop.tabuADNGenerator()
@@ -63,10 +58,10 @@ class StartAlgorithm:
 
         timeTabouOGMShared[ind] = time.time() - startTime
 
-        print("Found a result for taboulet OGM", ind, ":", worst)
+        if(doPrint): print("Found a result for taboulet OGM", ind, ":", worst)
 
-    def Fourmi(ind, worstsFourmiShared, ramFourmiShared, timeFourmiShared, data):
-        print("Calculating ant colony", ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
+    def Fourmi(ind, worstsFourmiShared, ramFourmiShared, timeFourmiShared, data, doPrint):
+        if(doPrint): print("Calculating ant colony", ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
 
         tracemalloc.start()
 
@@ -83,10 +78,10 @@ class StartAlgorithm:
 
         timeFourmiShared[ind] = time.time() - startTime
 
-        print("Found a result for ant colony", ind, ":", worst)
+        if(doPrint): print("Found a result for ant colony", ind, ":", worst)
 
-    def Recuit(ind, worstsRecuitShared, ramRecuitShared, timeRecuitShared, data):
-        print("Calculating simulated annealing", ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
+    def Recuit(ind, worstsRecuitShared, ramRecuitShared, timeRecuitShared, data, doPrint):
+        if(doPrint): print("Calculating simulated annealing", ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
 
         tracemalloc.start()
 
@@ -103,9 +98,9 @@ class StartAlgorithm:
 
         timeRecuitShared[ind] = time.time() - startTime
 
-        print("Found a result for simulated annealing", ind, ":", worst)
-    def Google(ind, worstsGoogleShared, ramGoogleShared, timeGoogleShared, data, gmeta):
-        print("Calculating Google with " + gmeta, ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
+        if(doPrint): print("Found a result for simulated annealing", ind, ":", worst)
+    def Google(ind, worstsGoogleShared, ramGoogleShared, timeGoogleShared, data, gmeta, doPrint):
+        if(doPrint): print("Calculating Google with " + gmeta, ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
 
         tracemalloc.start()
 
@@ -122,5 +117,5 @@ class StartAlgorithm:
 
         timeGoogleShared[ind] = time.time() - startTime
 
-        print("Found a result for Google", ind, ":", worst)
+        if(doPrint): print("Found a result for Google", ind, ":", worst)
     
