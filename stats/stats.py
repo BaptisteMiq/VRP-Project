@@ -36,6 +36,14 @@ worstsRecuitShared = []
 ramRecuitShared = []
 timeRecuitShared = []
 
+googleThreads = []
+worstsGoogleShared = []
+ramGoogleShared = []
+timeGoogleShared = []
+
+# Metaheuristic used by Google algorithms
+gmeta = "AUTOMATIC"
+
 # Wrap all algorithm functions to be started with only one argument
 def startGeneticWrapper(it):
     print("genThreads", genThreads)
@@ -46,11 +54,16 @@ def startFourmiWrapper(it):
     StartAlgorithm.Fourmi(it, worstsFourmiShared, ramFourmiShared, timeFourmiShared, fourmiThreads[it])
 def startRecuitWrapper(it):
     StartAlgorithm.Recuit(it, worstsRecuitShared, ramRecuitShared, timeRecuitShared, recuitThreads[it])
+def startGoogleWrapper(it):
+    StartAlgorithm.Google(it, worstsGoogleShared, ramGoogleShared, timeGoogleShared, googleThreads[it], gmeta)
 
-def GetStats(minIterations, maxIterations, padding, algos):
+def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC"):
+
+    global gmeta
+    gmeta = _gmeta
 
     # Maximum graph size
-    maxGraph = randomDataGenerator(1, maxIterations, False)
+    maxGraph = randomDataGenerator(1, maxIterations, False, 10)
 
     # Setup iterations
     minSize = minIterations
@@ -63,27 +76,32 @@ def GetStats(minIterations, maxIterations, padding, algos):
     worstsTabouOGM = [-1] * graphIterations
     worstsFourmi = [-1] * graphIterations
     worstsRecuit = [-1] * graphIterations
+    worstsGoogle = [-1] * graphIterations
 
     ramTabu = []
     ramGen = [-1] * graphIterations
     ramTabouOGM = [-1] * graphIterations
     ramFourmi = [-1] * graphIterations
     ramRecuit = [-1] * graphIterations
+    ramGoogle = [-1] * graphIterations
 
     timeTabu = []
     timeGen = [-1] * graphIterations
     timeTabouOGM = [-1] * graphIterations
     timeFourmi = [-1] * graphIterations
     timeRecuit = [-1] * graphIterations
+    timeGoogle = [-1] * graphIterations
 
     global genThreads
     global tabouOGMThreads
     global fourmiThreads
     global recuitThreads
+    global googleThreads
     genThreads = [None for _ in range(graphIterations)]
     tabouOGMThreads = [None for _ in range(graphIterations)]    
     fourmiThreads = [None for _ in range(graphIterations)]    
     recuitThreads = [None for _ in range(graphIterations)]    
+    googleThreads = [None for _ in range(graphIterations)]    
 
     it = 0 # Index of genThread to insert the result of the thread
     for i in range(minSize, maxSize, padding):  
@@ -133,6 +151,11 @@ def GetStats(minIterations, maxIterations, padding, algos):
             "g": g,
             "nbVehicules": 3
         }
+
+        googleThreads[it] = {
+            "g": g,
+            "nbVehicules": 3
+        }
         
         it += 1
 
@@ -142,28 +165,34 @@ def GetStats(minIterations, maxIterations, padding, algos):
     global worstsTabouOGMShared
     global worstsFourmiShared
     global worstsRecuitShared
+    global worstsGoogleShared
     worstsGenShared = manager.list(range(len(worstsGen)))
     worstsTabouOGMShared = manager.list(range(len(worstsTabouOGM)))
     worstsFourmiShared = manager.list(range(len(worstsFourmi)))
     worstsRecuitShared = manager.list(range(len(worstsRecuit)))
+    worstsGoogleShared = manager.list(range(len(worstsRecuit)))
 
     global ramGenShared
     global ramTabouOGMShared
     global ramFourmiShared
     global ramRecuitShared
+    global ramGoogleShared
     ramGenShared = manager.list(range(len(ramGen)))
     ramTabouOGMShared = manager.list(range(len(ramTabouOGM)))
     ramFourmiShared = manager.list(range(len(ramFourmi)))
     ramRecuitShared = manager.list(range(len(ramRecuit)))
+    ramGoogleShared = manager.list(range(len(ramRecuit)))
 
     global timeGenShared
     global timeTabouOGMShared
     global timeFourmiShared
     global timeRecuitShared
+    global timeGoogleShared
     timeGenShared = manager.list(range(len(timeGen)))
     timeTabouOGMShared = manager.list(range(len(timeTabouOGM)))
     timeFourmiShared = manager.list(range(len(timeFourmi)))
     timeRecuitShared = manager.list(range(len(timeRecuit)))
+    timeGoogleShared = manager.list(range(len(timeRecuit)))
 
     cores = mp.cpu_count() # Computer cores
     # coreProcesses = cores * 32 # Number of processes available for multiprocess pool
@@ -256,6 +285,28 @@ def GetStats(minIterations, maxIterations, padding, algos):
     if("recuit" in algos):
         worstsRecuit, ramRecuit, timeRecuit = MultiprocessRecuit(cores // 2)
 
+    # Define multi process logic
+    def MultiprocessGoogle(maxCores = cores):
+        # Define a maximum number of cores to use at the same time
+        # Will crash if the maximum is over the number of available cores
+        for i in range(math.ceil(len(googleThreads) / maxCores)):
+            print("Starting process subdivision", i)
+            # Start the algorithm on every specified core
+            
+            try:
+                mp.set_start_method('spawn')
+            except RuntimeError:
+                pass
+
+            p = mp.Pool(maxCores * 32)
+            print(i*maxCores, min(i*maxCores+maxCores, len(googleThreads)))
+            p.map(startGoogleWrapper, range(i*maxCores, min(i*maxCores+maxCores, len(googleThreads))))
+            p.close()
+        return (worstsGoogleShared, ramGoogleShared, timeGoogleShared)
+
+    if("google" in algos):
+        worstsGoogle, ramGoogle, timeGoogle = MultiprocessGoogle(cores // 2)
+
     x = [i for i in range(minSize, maxSize, padding)]
 
     dataset = []
@@ -269,6 +320,8 @@ def GetStats(minIterations, maxIterations, padding, algos):
         dataset.append({ "label": "Colonie de fourmis", "worst": worstsFourmi, "ram": ramFourmi, "time": timeFourmi })
     if("recuit" in algos):
         dataset.append({ "label": "Recuit simulé", "worst": worstsRecuit, "ram": ramRecuit, "time": timeRecuit })
+    if("google" in algos):
+        dataset.append({ "label": "Google (" + gmeta + ")", "worst": worstsGoogle, "ram": ramGoogle, "time": timeGoogle })
 
     return (x, dataset)
 

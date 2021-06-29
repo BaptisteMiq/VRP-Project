@@ -33,7 +33,7 @@ def tabu(graph, nbVehicules, nbIter, startPoint):
                     break
 
                 # Worst case
-                bestDistance = 9999
+                bestDistance = 99999999999
                 bestNeighbour = startPoint
 
                 # Search nearest neighbour

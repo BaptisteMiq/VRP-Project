@@ -2,6 +2,7 @@ from tabouletOGM.algogenOGM import geneticPathFinderOGM
 from algorithms.genetic import geneticPathFinder
 from algorithms.fourmi import antColonyAlg
 from algorithms.recuit import getBestRS
+from algorithms.google import googleORTools
 import tracemalloc
 import time
 
@@ -103,5 +104,23 @@ class StartAlgorithm:
         timeRecuitShared[ind] = time.time() - startTime
 
         print("Found a result for simulated annealing", ind, ":", worst)
+    def Google(ind, worstsGoogleShared, ramGoogleShared, timeGoogleShared, data, gmeta):
+        print("Calculating Google with " + gmeta, ind, "(", len(data["g"]), ":", data["nbVehicules"], ")")
 
+        tracemalloc.start()
+
+        startTime = time.time()
+
+        # ALGO
+        paths, worst = googleORTools(data["g"], data["nbVehicules"], gmeta)
+        worstsGoogleShared[ind] = worst
+
+        current, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+
+        ramGoogleShared[ind] = peak / 10**6
+
+        timeGoogleShared[ind] = time.time() - startTime
+
+        print("Found a result for Google", ind, ":", worst)
     
