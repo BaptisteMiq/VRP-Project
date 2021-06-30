@@ -42,6 +42,6 @@ def csvToGraph(file):
     return np.loadtxt(open(file, "r"), delimiter=",").tolist()
 
 def generateCsv():
-    sizes = [20, 40, 80, 140, 500]
+    sizes = [20, 40, 80, 140, 500, 2000]
     for i in range(len(sizes)):
         graphAsCsv("ran-" + str(sizes[i]) + "x" + str(sizes[i]) + ".csv", randomDataGenerator(1, sizes[i], False))
