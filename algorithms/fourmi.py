@@ -15,9 +15,9 @@ def antColonyAlg(dataPondArray, nombreCamions):
     dataArray = np.array(dataArray)
     nbVilles = dataArray[0].size
 
-    nbInteration = 50
+    nbInteration = 20
     evaporation = 0.5
-    nbFourmis = 50
+    nbFourmis = 20
     nbCamions = nombreCamions
 
     villeOr = 0

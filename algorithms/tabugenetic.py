@@ -186,7 +186,7 @@ class Population:
 
 # Alfo génétique pour solution problème voyageur de commerce complet :
 def iterateGeneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGeneneration, nbIteration, graph, startPosition, isDebug):
-    if isDebug: print("--- STARTING GENETIC ALGORITHME GRAPH PATH FINDING ---")
+    if isDebug: print("--- LANCEMENT DE L'ALGORITHME DE RECHERCHE TABOU GENETIQUE ---")
     
     bestPath = list()
     bestFitnessList = list()
@@ -195,7 +195,7 @@ def iterateGeneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGenene
     bestGlobalFitness = 0
 
     for nbIte in range(nbIteration):
-        if isDebug: print("------ Entering new iteration:", nbIte)
+        if isDebug: print("------ Nouvelle itération:", nbIte)
         pop = Population(mutationChance, graphSize, nbVehicule, graph, startPosition, isDebug)
         pop.start(maxGeneneration)
         if pop.bestFitness > bestFitness:
@@ -207,20 +207,20 @@ def iterateGeneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGenene
 
     if isDebug:
         print("-------------------------------------------------")
-        print("--- !!! FINISHED !!! ---")
+        print("--- !!! FINI !!! ---")
         print(bestPath)
-        print("worst fitness:",bestFitness)
-        print("global fitness:", bestGlobalFitness)
-        print("detailed vehicule fitness list:")
-        print(bestVehiculePath)
-        print(bestFitnessList)
+        print("Camion avec la pire pondération cumulée:",bestFitness)
+        print("Somme des pondérations cumulées:", bestGlobalFitness)
+        print("Trajets des camions:")
+        # print(bestVehiculePath)
+        # print(bestFitnessList)
         for i in range(len(bestFitnessList)):
-            print("Vehicule N°", i, "-", bestVehiculePath[i], "-", bestFitnessList[i])
+            print("Véhicule N°", i, "-", bestVehiculePath[i], "-", bestFitnessList[i])
 
 
 # Alfo génétique pour solution problème voyageur de commerce complet :
-def geneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGeneneration, graph, startPosition, isDebug):
-    if isDebug: print("--- STARTING GENETIC ALGORITHME GRAPH PATH FINDING ---")
+def geneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGeneneration, graph, startPosition, isDebug, returnList = False):
+    if isDebug: print("--- LANCEMENT DE L'ALGORITHME DE RECHERCHE TABOU GENETIQUE ---")
     
     pop = Population(mutationChance, graphSize, nbVehicule, graph, startPosition, isDebug)
     pop.start(maxGeneneration)
@@ -233,14 +233,14 @@ def geneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGeneneration,
 
     if isDebug:
         print("-------------------------------------------------")
-        print("--- !!! FINISHED !!! ---")
-        print(bestPath)
-        print("worst fitness:",bestFitness)
-        print("global fitness:", bestGlobalFitness)
-        print("detailed vehicule fitness list:")
-        print(bestVehiculePath)
-        print(bestFitnessList)
+        print("--- !!! FINI !!! ---")
+        print("Camion avec la pire pondération cumulée:",bestFitness)
+        print("Somme des pondérations cumulées:", bestGlobalFitness)
+        print("Trajets des camions:")
         for i in range(len(bestFitnessList)):
-            print("Vehicule N°", i, "-", bestVehiculePath[i], "-", bestFitnessList[i])
+            print("Véhicule N°", i, "-", bestVehiculePath[i], "-", bestFitnessList[i])
         
-    return bestFitness
+    if(returnList):
+        return bestVehiculePath
+    else:
+        return bestFitness

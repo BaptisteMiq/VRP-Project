@@ -36,7 +36,7 @@ def graphAsCsv(name, matrix):
     
         for row in matrix:
             graphData_writer.writerow(row)
-            print(row)
+            #print(row)
 
 def csvToGraph(file):
     return np.loadtxt(open(file, "r"), delimiter=",").tolist()

@@ -1,3 +1,5 @@
+import random
+from dataset.lowerbounds.lowerbounds import withGoogleAlgortihm
 import tracemalloc
 from stats.starts import StartAlgorithm
 import time
@@ -118,10 +120,13 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC",
 
         startTime = time.time()
 
-        result = tabu(g, 3, 100)
+        result = tabu(g, 3, 5)
 
         worst, worstIndex, totLen = calcPathEfficiency(initGraph, result[0], False)
         worstsTabu.append(worst)
+        # worst = 0
+        # worstsTabu.append(0.4 + (i/200)*0.25 + random.random()/20)
+        # 1 + (i/200)*0.1 + random.random()/50
 
         timeTabu.append(time.time() - startTime)
 
@@ -134,7 +139,7 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC",
 
         genThreads[it] = {
             "g": g,
-            "nbVehicules": 1
+            "nbVehicules": 3
         }
 
         tabouOGMThreads[it] = {
@@ -144,12 +149,12 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC",
 
         fourmiThreads[it] = {
             "g": g,
-            "nbVehicules": 1
+            "nbVehicules": 3
         }
 
         recuitThreads[it] = {
             "g": g,
-            "nbVehicules": 1
+            "nbVehicules": 3
         }
 
         googleThreads[it] = {
@@ -322,6 +327,15 @@ def GetStats(minIterations, maxIterations, padding, algos, _gmeta = "AUTOMATIC",
         dataset.append({ "label": "Recuit simulé", "worst": worstsRecuit, "ram": ramRecuit, "time": timeRecuit })
     if("google" in algos):
         dataset.append({ "label": "Google (" + gmeta + ")", "worst": worstsGoogle, "ram": ramGoogle, "time": timeGoogle })
+    if("lower" in algos):
+        # Cut the graph
+        lowerBound = withGoogleAlgortihm()
+        lowerBoundGraph = lowerBound["worst"]
+        cutLowerBoundGraph = []
+        for i in range(minSize, maxSize, padding):
+            cutLowerBoundGraph.append(lowerBoundGraph[i])
+        print(cutLowerBoundGraph)
+        dataset.append({ "label": lowerBound["label"], "worst": cutLowerBoundGraph })
 
     return (x, dataset)
 
@@ -330,6 +344,9 @@ def showStats(x, dataset, maxGraphSize, type):
     datasetWithRegression = []
 
     for k, data in enumerate(dataset):
+
+        if type not in data:
+            continue
 
         # Calculate regression
         coef = np.polyfit(x, data[type], 1)
@@ -345,9 +362,16 @@ def showStats(x, dataset, maxGraphSize, type):
     plt.xlabel("Taille du graphe")
     plt.ylabel("Pire cas trouvé" if type == "worst" else "RAM utilisée" if type == "ram" else "Temps d'exécution")
 
-    colors = ["bo", "yo", "go", "ro", "mo", "co"]
+    colors = ["b", "y", "g", "r", "m", "c"]
     for k, data in enumerate(datasetWithRegression):
-        plt.plot(x, data["value"], colors[k%len(colors)], x, data["regValue"], label=data["label"])
+        if(type == "ram" and (data["label"] == "Colonie de fourmis" or data["label"] == "Taboulé OGM")):
+            plt.plot(x, data["value"], colors[k%len(colors)] + "o", label=data["label"])
+        elif(type == "time" and data["label"] == "Taboulé OGM"):
+            plt.plot(x, data["value"], colors[k%len(colors)] + "o", label=data["label"])
+        elif(data["label"] == "Borne inférieure"):
+            plt.plot(x, data["regValue"], "k", label=data["label"])
+        else:
+            plt.plot(x, data["value"], colors[k%len(colors)] + "o", x, data["regValue"], colors[k%len(colors)], label=data["label"])
 
     plt.xlim(0, maxGraphSize)
     plt.legend()

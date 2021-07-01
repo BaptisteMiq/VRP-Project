@@ -48,12 +48,12 @@ def drawGraphs(graph, graphs, labels=None, graph_layout='shell',
 
     fullGraph = values
 
-    plt.figure(figsize=(20,12))
+    plt.figure(figsize=(20,20))
 
     # create networkx graph
     G=nx.Graph()
     
-    allColors = ["red", "green", "blue", "purple", "pink", "yellow", "brow", "cyan"]
+    allColors = ["red", "green", "blue", "brown", "pink", "yellow", "purple", "cyan"]
     allColorsIndex = 0
     
     
