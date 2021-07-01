@@ -1,23 +1,27 @@
-# Population element DNA object :
+#Importation de l'algorithme tabou
 from algorithms.tabu import tabu
-
 import copy, random
 
+#Classe ADN de trajet
+# - Objet décrivant un élément contenu dans la liste population
+# - Possède toutes les attributs et méthodes nécessaire à la situation(score de fitness) d'un  élément dans la population
 class ADNtrajet:
     
-    ADN = list()
-    tailleADN = 0
-    fitness = 0
-    globalFitness = 0
-    fitnessList = list()
-    vehiculeADNlist = list()
+    ADN = list()                #Liste descriptive du trajet ou configuration de trajet totale (tout camion confondu)
+    tailleADN = 0               #Taille de la liste ADN
+    fitness = 0                 #Score de fitness, correspond à la somme de pondération du pire trajet d'un camion
+    globalFitness = 0           #Score de fitness total tout camion confondu
+    fitnessList = list()        #Liste des différentes fitness, pour chaque camion
+    vehiculeADNlist = list()    #Liste des trajet par camion
     
-    
+    #Initialisation de l'objet élément ADNtrajet
     def __init__(self, values, graph):
         self.ADN = values
         self.tailleADN = len(values)
         self.calcFitness(graph)
-        
+
+
+    #Méthode de calcul et de mise à jour des fitness de l'élément
     def calcFitness(self, graph):
         startPos = 0
         stopPos = 0
@@ -34,12 +38,15 @@ class ADNtrajet:
                 currentVehiculeFitness = 0
         self.fitness = max(self.fitnessList)
         
+    #Méthode de calcul de la fitness globale
     def calcGlobalFitness(self, graph):
         # Calcul retour au sommet de départ
         self.globalFitness = 0
         for i in range(self.tailleADN-1):
             self.globalFitness += graph[self.ADN[i]][self.ADN[i+1]]
     
+    #Méthode de mutation de l'ADN (configuration du trajet) de l'élément
+    #La mutation s'effectue par la permutation de deux sommets dans l'ADN
     def forceMutate(self, nbMutation, graph):
         for _ in range(nbMutation):
             swapPos1 = 0
@@ -59,23 +66,25 @@ class ADNtrajet:
 # Population object
 class Population:
     
-    populations = []
+    populations = []            #Liste des éléments de la population
+
+    nbMutation = 1              #Nombre de mutaion à effectuer sur les éléments concernés
+    populationSize = 100        #Taille de la population (taille de liste)
     
-    nbMutation = 0.01
-    populationSize = 100
+    graph = []                  #Graphe complet avec pondération, où on peut récupérer les données de sommet et de pondération
+    nbSommet = 0                #Nombre de sommet dans le graphe
+    nbVehivule = 1              #Nombre de véhicules qui doivent parcourir le graphe
+    startPosition = 0           #Position de départ (ou dépôt) des véhicule dans le graphe
+    debug = False               #Mode de debug (affichage des prints)
     
-    graph = []
-    nbSommet = 0
-    nbVehivule = 1
-    startPosition = 0
-    debug = False
+    bestPath = list()           #Meilleure configuration de trajet globale enregistrée
+    bestFitness = 0             #Meilleure score de fitness (du pire trajet de camion) provenant du meilleur élément de la population
+    bestFitnessList = list()    #Meilleure liste de fitness par véhicule
+    bestVehiculePath = list()   #Meilleure configuration de trajet par véhicule
+    bestGlobalFitness = 0       #Meilleure fitness globale
     
-    bestPath = list()
-    bestFitness = 0
-    bestFitnessList = list()
-    bestVehiculePath = list()
-    bestGlobalFitness = 0
-    
+    #Initialisation de la population
+    # - Création de tous les éléments dans la population
     def __init__(self, mutation, size, vehicule, graph, startPos, isDebug):
 
         self.nbMutation = mutation
@@ -122,18 +131,20 @@ class Population:
         self.bestVehiculePath = self.populations[0].vehiculeADNlist
         self.bestGlobalFitness = self.populations[0].globalFitness
 
-
+    #Méthode utilisant le tabou afin de créer une configuration de base pour la nouvelle population
     def tabuADNGenerator(self):
         tabuPath = tabu(self.graph, self.nbVehicule, 20, self.startPosition, True)
         #print(tabuPath)
         return tabuPath
 
+    #Méthode retournant toutes les ADNs (configuration de trajet) des éléments
     def getPopADNs(self):
         ADNs = list()
         for o in self.populations:
             ADNs.append(o.ADN)
         return ADNs
     
+    #Méthode permettant de vérifier si un élément est en double dans la liste de population
     def isDuplicate(self, i):
         ADNlist = self.getPopADNs()
         ADNlist.pop(i)
@@ -142,10 +153,12 @@ class Population:
         else:
             return False
     
+    #Méthode permettant d'afficher les ADNs des élements
     def printPop(self):
         for o in self.populations:
             print(o.ADN, o.fitness)
 
+    #Méthode permettant de lancer l'algorithme tabou-génétique en fonction du nombre de génération maximale à effectuer
     def start(self, maxGen):
 
         if self.nbSommet == 2:
@@ -184,7 +197,7 @@ class Population:
 
 # END CLASS "Population"
 
-# Alfo génétique pour solution problème voyageur de commerce complet :
+#Fonction permettant d'effectuer plusieurs itérations sur l'algorithme
 def iterateGeneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGeneneration, nbIteration, graph, startPosition, isDebug):
     if isDebug: print("--- LANCEMENT DE L'ALGORITHME DE RECHERCHE TABOU GENETIQUE ---")
     
@@ -218,7 +231,7 @@ def iterateGeneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGenene
             print("Véhicule N°", i, "-", bestVehiculePath[i], "-", bestFitnessList[i])
 
 
-# Alfo génétique pour solution problème voyageur de commerce complet :
+#Fonction permettant de lancer l'algorithme tabou-génétique (une seule itérations)
 def geneticPathFinderOGM(mutationChance, graphSize, nbVehicule, maxGeneneration, graph, startPosition, isDebug, returnList = False):
     if isDebug: print("--- LANCEMENT DE L'ALGORITHME DE RECHERCHE TABOU GENETIQUE ---")
     
