@@ -1,13 +1,12 @@
 import random
-# from numba import jit, cuda
 
-# Population element DNA object :
-# - Peut être à changer en trajet / ADNTrajet
-
+#Classe ADN de trajet
+# - Objet décrivant un élément contenu dans la liste population
+# - Possède toutes les attributs et méthodes nécessaire à la situation(score de fitness) d'un  élément dans la population
 class ADNtrajet:
     
-    ADN = list()
-    tailleADN = 0
+    ADN = list()                #Liste descriptive du trajet ou configuration de trajet totale
+    tailleADN = 0               #Taille de la liste ADN
     fitness = 0
     globalFitness = 0
     fitnessList = list()
